@@ -284,32 +284,30 @@ def registerAluno():
 
 @alunos_bp.route('/alunoBuscaAtivaOne', methods=['POST'])
 @jwt_required()
-def registerAlunoOne(): 
+def registerAlunoOne():
     try:
         data = request.get_json()
 
-        if alunos.find_one({"RA": data["RA"]}):
+        # Checar duplicidade de RA
+        if alunos.find_one({"RA": data.get("RA", "").strip()}):
             return {"error": "Este aluno já existe"}, 400
 
-        # TRATAR TURMA
-        turma_raw = data.get("turma", "").strip()
+        # Tratamento de turma
+        turma_raw = str(data.get("turma", "")).strip()
         if len(turma_raw) >= 2:
             turma_formatada = turma_raw[0] + turma_raw[1].upper()
         else:
             turma_formatada = turma_raw.upper()
 
-        # TRATAR FALTAS
+        # Tratamento de faltas
         faltas_str = str(data.get("faltas", "")).strip()
-        if faltas_str == "" or not faltas_str.isdigit():
-            faltas_int = 0
-        else:
-            faltas_int = int(faltas_str)
+        faltas_int = int(faltas_str) if faltas_str.isdigit() else 0
 
-        # PREPARAR ALUNO
+        # Montar objeto aluno
         aluno = {
-            "nome": data["nome"].capitalize(),
+            "nome": str(data.get("nome", "")).capitalize(),
             "turma": turma_formatada,
-            "RA": data["RA"],
+            "RA": str(data.get("RA", "")).strip(),
             "endereco": data.get("endereco", ""),
             "telefone": data.get("telefone", ""),
             "telefone2": data.get("telefone2", ""),
@@ -324,9 +322,10 @@ def registerAlunoOne():
             "atualizacao": datetime.datetime.now().year
         }
 
+        # Inserir aluno
         alunos.insert_one(aluno)
 
-        # CRIAR CASO
+        # Criar e inserir caso
         caso = {
             "ligacoes": [],
             "visitas": [],
@@ -344,7 +343,6 @@ def registerAlunoOne():
     except Exception as e:
         print("Erro no cadastro:", str(e))
         return {"error": str(e)}, 500
-
 
 @alunos_bp.route('/alunoBuscaAtiva/<aluno_id>', methods=['PUT'])
 @jwt_required()
