@@ -281,7 +281,6 @@ def registerAluno():
         print(str(e))
         return {"error": str(e)}, 500
 
-
 @alunos_bp.route('/alunoBuscaAtivaOne', methods=['POST'])
 @jwt_required()
 def registerAlunoOne():
@@ -303,7 +302,7 @@ def registerAlunoOne():
         faltas_str = str(data.get("faltas", "")).strip()
         faltas_int = int(faltas_str) if faltas_str.isdigit() else 0
 
-        # Montar objeto aluno
+        # Montar aluno
         aluno = {
             "nome": str(data.get("nome", "")).capitalize(),
             "turma": turma_formatada,
@@ -322,10 +321,9 @@ def registerAlunoOne():
             "atualizacao": datetime.datetime.now().year
         }
 
-        # Inserir aluno no banco
         alunos.insert_one(aluno)
 
-        # Criar caso com aluno incluso
+        # Criar caso com proteção
         caso = {
             "ligacoes": [],
             "visitas": [],
@@ -336,7 +334,6 @@ def registerAlunoOne():
             "urgencia": "INDEFINIDA"
         }
 
-        # Tentar salvar o caso, com log detalhado em caso de erro
         try:
             casos.insert_one(caso)
         except Exception as e:
@@ -351,6 +348,7 @@ def registerAlunoOne():
     except Exception as e:
         print("Erro no cadastro:", str(e))
         return {"error": str(e)}, 500
+500
 
 @alunos_bp.route('/alunoBuscaAtiva/<aluno_id>', methods=['PUT'])
 @jwt_required()
