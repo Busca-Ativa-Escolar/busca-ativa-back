@@ -322,10 +322,10 @@ def registerAlunoOne():
             "atualizacao": datetime.datetime.now().year
         }
 
-        # Inserir aluno
+        # Inserir aluno no banco
         alunos.insert_one(aluno)
 
-        # Criar e inserir caso
+        # Criar caso com aluno incluso
         caso = {
             "ligacoes": [],
             "visitas": [],
@@ -336,7 +336,15 @@ def registerAlunoOne():
             "urgencia": "INDEFINIDA"
         }
 
-        casos.insert_one(caso)
+        # Tentar salvar o caso, com log detalhado em caso de erro
+        try:
+            casos.insert_one(caso)
+        except Exception as e:
+            print("❌ Erro ao salvar caso:")
+            print("📦 Caso:", caso)
+            print("👤 Aluno:", aluno)
+            print("🚨 Erro:", str(e))
+            return {"error": f"Erro ao salvar o caso: {str(e)}"}, 500
 
         return {"message": "Aluno cadastrado com sucesso"}, 201
 
