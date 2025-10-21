@@ -287,36 +287,64 @@ def registerAluno():
 def registerAlunoOne(): 
     try:
         data = request.get_json()
+
         if alunos.find_one({"RA": data["RA"]}):
             return {"error": "Este aluno já existe"}, 400
-        data["nome"] = data["nome"].capitalize()
-        data["turma"] = str(data["turma"][0]) + data["turma"][1].upper()
-        data["dataNascimento"] = data["dataNascimento"]
-        data["tarefas"] = []
-        data["situacao"] = "COMPLETO"
-        data["ativo"] = "sim"
-        data["atualizacao"] = datetime.datetime.now().year
-        alunos.insert_one(data)
-        caso = {}
-        caso["ligacoes"] = []
-        caso["visitas"] = []
-        caso["atendimentos"] = []
-        caso["aluno"] = data
-        caso["status"] = "FINALIZADO"
+
+        # TRATAR TURMA
+        turma_raw = data.get("turma", "").strip()
+        if len(turma_raw) >= 2:
+            turma_formatada = turma_raw[0] + turma_raw[1].upper()
+        else:
+            turma_formatada = turma_raw.upper()
+
+        # TRATAR FALTAS
         faltas_str = str(data.get("faltas", "")).strip()
         if faltas_str == "" or not faltas_str.isdigit():
             faltas_int = 0
         else:
             faltas_int = int(faltas_str)
 
-        caso["faltas"] = faltas_int
+        # PREPARAR ALUNO
+        aluno = {
+            "nome": data["nome"].capitalize(),
+            "turma": turma_formatada,
+            "RA": data["RA"],
+            "endereco": data.get("endereco", ""),
+            "telefone": data.get("telefone", ""),
+            "telefone2": data.get("telefone2", ""),
+            "responsavel": data.get("responsavel", ""),
+            "responsavel2": data.get("responsavel2", ""),
+            "dataNascimento": data.get("dataNascimento", ""),
+            "utiliz_teg": data.get("utiliz_teg", "NÃO"),
+            "tarefas": [],
+            "faltas": faltas_int,
+            "situacao": "COMPLETO",
+            "ativo": "sim",
+            "atualizacao": datetime.datetime.now().year
+        }
 
-        caso["urgencia"] = "INDEFINIDA"
-        #cadastrar na base de dados
-        casos.insert_one(caso)     
+        alunos.insert_one(aluno)
+
+        # CRIAR CASO
+        caso = {
+            "ligacoes": [],
+            "visitas": [],
+            "atendimentos": [],
+            "aluno": aluno,
+            "status": "FINALIZADO",
+            "faltas": faltas_int,
+            "urgencia": "INDEFINIDA"
+        }
+
+        casos.insert_one(caso)
+
         return {"message": "Aluno cadastrado com sucesso"}, 201
+
     except Exception as e:
+        print("Erro no cadastro:", str(e))
         return {"error": str(e)}, 500
+
 
 @alunos_bp.route('/alunoBuscaAtiva/<aluno_id>', methods=['PUT'])
 @jwt_required()
