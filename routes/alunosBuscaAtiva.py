@@ -303,7 +303,7 @@ def registerAlunoOne():
         caso["atendimentos"] = []
         caso["aluno"] = data
         caso["status"] = "FINALIZADO"
-        caso["faltas"] = int(data["faltas"])
+        caso["faltas"] = int(data["faltas"]) if str(data.get("faltas", "")).strip().isdigit() else 0
         caso["urgencia"] = "INDEFINIDA"
         #cadastrar na base de dados
         casos.insert_one(caso)     
