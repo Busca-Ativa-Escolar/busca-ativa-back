@@ -287,26 +287,29 @@ def registerAlunoOne():
     try:
         data = request.get_json()
 
-        # Checar duplicidade de RA
-        if alunos.find_one({"RA": data.get("RA", "").strip()}):
+        # 🔹 Pega o RA e normaliza
+        ra = str(data.get("RA", "")).strip()
+
+        # 🔹 Checar duplicidade apenas se RA for informado
+        if ra and alunos.find_one({"RA": ra}):
             return {"error": "Este aluno já existe"}, 400
 
-        # Tratamento de turma
+        # 🔹 Tratamento de turma
         turma_raw = str(data.get("turma", "")).strip()
         if len(turma_raw) >= 2:
             turma_formatada = turma_raw[0] + turma_raw[1].upper()
         else:
             turma_formatada = turma_raw.upper()
 
-        # Tratamento de faltas
+        # 🔹 Tratamento de faltas
         faltas_str = str(data.get("faltas", "")).strip()
         faltas_int = int(faltas_str) if faltas_str.isdigit() else 0
 
-        # Montar aluno
+        # 🔹 Montar objeto aluno
         aluno = {
             "nome": str(data.get("nome", "")).capitalize(),
             "turma": turma_formatada,
-            "RA": str(data.get("RA", "")).strip(),
+            "RA": ra or "",  # Garante que RA vazio não causa duplicidade
             "endereco": data.get("endereco", ""),
             "telefone": data.get("telefone", ""),
             "telefone2": data.get("telefone2", ""),
@@ -321,9 +324,10 @@ def registerAlunoOne():
             "atualizacao": datetime.datetime.now().year
         }
 
+        # 🔹 Inserir aluno
         alunos.insert_one(aluno)
 
-        # Criar caso com proteção
+        # 🔹 Criar caso vinculado
         caso = {
             "ligacoes": [],
             "visitas": [],
@@ -348,7 +352,7 @@ def registerAlunoOne():
     except Exception as e:
         print("Erro no cadastro:", str(e))
         return {"error": str(e)}, 500
-500
+
 
 @alunos_bp.route('/alunoBuscaAtiva/<aluno_id>', methods=['PUT'])
 @jwt_required()
