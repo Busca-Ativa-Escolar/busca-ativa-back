@@ -342,7 +342,7 @@ def registerAlunoOne():
             "visitas": [],
             "atendimentos": [],
             "aluno": aluno,
-            "status": "FINALIZADO",
+            "status": "NENHUM",
             "faltas": faltas_int,
             "urgencia": "INDEFINIDA"
         }
