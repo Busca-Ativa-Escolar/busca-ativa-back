@@ -3,15 +3,20 @@ FROM python:3.10-slim
 
 # Instalar dependências do sistema
 RUN apt-get update && apt-get install -y \
-    wkhtmltopdf \
+    wget \
     build-essential \
     python3-dev \
     libxml2-dev \
     libxslt1-dev \
     zlib1g-dev \
     libjpeg-dev \
-    && apt-get clean \
-    && rm -rf /var/lib/apt/lists/*
+    xfonts-75dpi \
+    xfonts-base \
+ && wget https://github.com/wkhtmltopdf/packaging/releases/download/0.12.6-1/wkhtmltox_0.12.6-1.buster_amd64.deb \
+ && apt-get install -y ./wkhtmltox_0.12.6-1.buster_amd64.deb \
+ && rm -f wkhtmltox_0.12.6-1.buster_amd64.deb \
+ && apt-get clean \
+ && rm -rf /var/lib/apt/lists/*
 
 # Criar e definir o diretório de trabalho
 WORKDIR /app
