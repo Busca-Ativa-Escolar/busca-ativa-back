@@ -296,8 +296,18 @@ def registerAlunoOne():
 
         # 🔹 Tratamento de turma
        
+        # 🔹 Detecta se é turma EJA e normaliza formato "4B - EJA"
         turma_raw = str(data.get("turma", "")).strip().upper()
-        turma_formatada = turma_raw
+
+        if "EJA" in turma_raw:
+            # Remove duplicações e espaços extras
+            turma_formatada = turma_raw.replace("EJA", "").replace("-", "").strip()
+            if turma_formatada.endswith("E"):
+                turma_formatada = turma_formatada[:-1]
+            turma_formatada = turma_formatada.replace(" ", "") + " - EJA"
+        else:
+            turma_formatada = turma_raw.replace(" ", "").replace("-", "")
+
 
 
         # 🔹 Tratamento de faltas
