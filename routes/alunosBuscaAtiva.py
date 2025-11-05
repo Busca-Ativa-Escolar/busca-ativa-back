@@ -295,11 +295,10 @@ def registerAlunoOne():
             return {"error": "Este aluno já existe"}, 400
 
         # 🔹 Tratamento de turma
-        turma_raw = str(data.get("turma", "")).strip()
-        if len(turma_raw) >= 2:
-            turma_formatada = turma_raw[0] + turma_raw[1].upper()
-        else:
-            turma_formatada = turma_raw.upper()
+       
+        turma_raw = str(data.get("turma", "")).strip().upper()
+        turma_formatada = turma_raw
+
 
         # 🔹 Tratamento de faltas
         faltas_str = str(data.get("faltas", "")).strip()
