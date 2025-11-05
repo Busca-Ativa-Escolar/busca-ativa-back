@@ -4,14 +4,21 @@ FROM python:3.10-slim
 # Instalar dependências do sistema
 RUN apt-get update && apt-get install -y \
     wget \
+    fontconfig \
+    libfreetype6 \
+    libjpeg62-turbo \
+    libpng16-16 \
+    libx11-6 \
+    libxext6 \
+    libxrender1 \
+    libssl3 \
+    xfonts-75dpi \
+    xfonts-base \
     build-essential \
     python3-dev \
     libxml2-dev \
     libxslt1-dev \
     zlib1g-dev \
-    libjpeg-dev \
-    xfonts-75dpi \
-    xfonts-base \
  && wget https://github.com/wkhtmltopdf/packaging/releases/download/0.12.6-1/wkhtmltox_0.12.6-1.buster_amd64.deb \
  && apt-get install -y ./wkhtmltox_0.12.6-1.buster_amd64.deb \
  && rm -f wkhtmltox_0.12.6-1.buster_amd64.deb \
